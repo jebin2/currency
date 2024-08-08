@@ -69,7 +69,7 @@ if ('serviceWorker' in navigator) {
             .then(registration => {
                 const currencyData = localStorage.getItem('currencyData');
                 if(currencyData) {
-                    processData(currencyData);
+                    processData(JSON.parse(currencyData));
                 } else {
                     fetch('https://jeapis.netlify.app/.netlify/functions/currency?from=USD&to=INR')
                     .then(response => response.json())
