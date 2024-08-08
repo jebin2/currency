@@ -27,7 +27,7 @@ if ('serviceWorker' in navigator) {
         return convertedAmount;
     }
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
+        navigator.serviceWorker.register('/currency/service-worker.js')
             .then(registration => {
                 const loadingElement = document.getElementById('loading');
                 const exchangeRateElement = document.getElementById('exchangeRate');
