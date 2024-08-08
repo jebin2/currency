@@ -1,11 +1,12 @@
 const CACHE_NAME = 'v1';
 const urlsToCache = [
     '/',
-    '/index.html',
-    '/styles.css',
-    '/app.js',
-    '/manifest.json',
-    '/github-mark-white.png'
+    '/currency',
+    '/currency/index.html',
+    '/currency/styles.css',
+    '/currency/app.js',
+    '/currency/manifest.json',
+    '/currency/github-mark-white.png'
 ];
 
 self.addEventListener('install', event => {
