@@ -67,14 +67,14 @@ if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/currency/service-worker.js')
             .then(registration => {
-                const currencyData = localStorage.getItem('currencyData');
+                const currencyData = localStorage.getItem('currencyData' + new Date().toLocaleDateString());
                 if(currencyData) {
                     processData(JSON.parse(currencyData));
                 } else {
                     fetch('https://jeapis.netlify.app/.netlify/functions/currency?from=USD&to=INR')
                     .then(response => response.json())
                     .then(data => {
-                        localStorage.setItem('currencyData', JSON.stringify(data));
+                        localStorage.setItem('currencyData' + new Date().toLocaleDateString(), JSON.stringify(data));
                         processData(data);
                     })
                     .catch(error => {
