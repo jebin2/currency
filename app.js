@@ -26,14 +26,14 @@ if ('serviceWorker' in navigator) {
 
         return convertedAmount;
     }
-    function processData() {
+    function processData(data) {
         
         const exchangeRateElement = document.getElementById('exchangeRate');
         const fromSelect = document.getElementById('fromSelect');
         const toSelect = document.getElementById('toSelect');
         const fromAmount = document.getElementById('fromAmount');
         const toAmount = document.getElementById('toAmount');
-        
+
         const rates = data.rates;
         loadingElement.style.display = 'none';
 
