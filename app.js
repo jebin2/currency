@@ -71,6 +71,7 @@ if ('serviceWorker' in navigator) {
                 if(currencyData) {
                     processData(JSON.parse(currencyData));
                 } else {
+                    localStorage.clear();
                     fetch('https://jeapis.netlify.app/.netlify/functions/currency?from=USD&to=INR')
                     .then(response => response.json())
                     .then(data => {
