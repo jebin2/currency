@@ -28,6 +28,7 @@ if ('serviceWorker' in navigator) {
     }
     function processData(data) {
         
+        const loadingElement = document.getElementById('loading');
         const exchangeRateElement = document.getElementById('exchangeRate');
         const fromSelect = document.getElementById('fromSelect');
         const toSelect = document.getElementById('toSelect');
@@ -66,8 +67,6 @@ if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/currency/service-worker.js')
             .then(registration => {
-                const loadingElement = document.getElementById('loading');
-
                 const currencyData = localStorage.getItem('currencyData');
                 if(currencyData) {
                     processData(currencyData);
@@ -80,7 +79,7 @@ if ('serviceWorker' in navigator) {
                     })
                     .catch(error => {
                         console.error('Error fetching data:', error);
-                        loadingElement.textContent = 'Failed to load data. Please try again later.';
+                        document.getElementById('loading').textContent = 'Failed to load data. Please try again later.';
                     });
                 }
             })
