@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Currency Converter</title>
+    <title>Currency Rates</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="manifest" href="/currency/manifest.json">
     <style>
@@ -79,14 +79,36 @@
     img {
         width: 20px;
     }
+    .header {
+        padding: 20px;
+        top: 0px;
+        position: fixed;
+        border-bottom: 1px solid green;
+        width: 100%;
+        box-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
+        font-size: 2rem;
+        font-weight: bolder;
+    }
+    
+    .footer {
+        padding: 20px;
+        bottom: 0px;
+        position: fixed;
+        border-top: 1px solid green;
+        width: 100%;
+        
+        box-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
+    }
     </style>
     <script src="app.js"></script>
 </head>
 
 <body>
+    <div class="header">
+        Currency Rates
+    </div>
     <div class="container">
         <div class="card" id="apiCard">
-            <h1>Currency Check</h1>
             <div id="loading" class="loading">Loading...</div>
             <div class="exchange-rate" id="exchangeRate"></div>
             <div class="form-group">
@@ -99,12 +121,12 @@
                 </select>
                 <input type="number" id="toAmount" min="0" />
             </div>
-            <div class="note">
-                <a href="https://github.com/jebin2/apis" target="_blank" rel="noopener noreferrer">
-                    <img src="github-mark-white.png" />
-                </a>
-            </div>
         </div>
+    </div>
+    <div class="footer">
+        <a href="https://github.com/jebin2/apis" target="_blank" rel="noopener noreferrer">
+            <img src="github-mark-white.png" />
+        </a>
     </div>
 </body>
 
