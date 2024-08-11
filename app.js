@@ -30,7 +30,7 @@ if ('serviceWorker' in navigator) {
         const fromCurrency = fromSelect.value;
         const toCurrency = toSelect.value;
 
-        const convertedAmount = convertCurrency(value, type === "from" ? fromCurrency : toCurrency, type === "from" ? toCurrency : fromCurrency, rates);
+        const convertedAmount = convertCurrency(parseFloat(value), type === "from" ? fromCurrency : toCurrency, type === "from" ? toCurrency : fromCurrency, rates);
         field.value = convertedAmount.toFixed(6);
     }
     function processData(data) {
