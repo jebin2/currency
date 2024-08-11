@@ -2,13 +2,12 @@ if ('serviceWorker' in navigator) {
     function updateDisplayContent(exchangeRateElement, fromSelect, toSelect, exchangeRates) {
         const fromCurrency = fromSelect.value;
         const toCurrency = toSelect.value;
-        const rate = exchangeRates[toCurrency] / exchangeRates[fromCurrency];
-        exchangeRateElement.textContent = `1 ${fromCurrency} = ${rate.toFixed(6)} ${toCurrency}`;
+        exchangeRateElement.textContent = `1 ${fromCurrency} = ${convertCurrency(1, fromCurrency, toCurrency, exchangeRates)} ${toCurrency}`;
     }
 
     function convertCurrency(amount, fromCurrency, toCurrency, rates) {
         if (fromCurrency === toCurrency) {
-            return amount;
+            return amount % 1 === 0 ? amount : amount.toFixed(6);
         }
 
         const fromRate = rates[fromCurrency];
@@ -24,7 +23,7 @@ if ('serviceWorker' in navigator) {
             rates[cur] = rates[cur] / fromRate;
         }
 
-        return convertedAmount;
+        return convertedAmount % 1 === 0 ? convertedAmount : convertedAmount.toFixed(6);
     }
     function updateAmounts(value, field, type, fromSelect, toSelect, rates) {
         const fromCurrency = fromSelect.value;
