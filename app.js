@@ -26,11 +26,11 @@ if ('serviceWorker' in navigator) {
 
         return convertedAmount;
     }
-    function updateAmounts(field, type, fromSelect, toSelect, rates) {
+    function updateAmounts(value, field, type, fromSelect, toSelect, rates) {
         const fromCurrency = fromSelect.value;
         const toCurrency = toSelect.value;
 
-        const convertedAmount = convertCurrency(field.value, type === "from" ? fromCurrency : toCurrency, type === "from" ? toCurrency : fromCurrency , rates);
+        const convertedAmount = convertCurrency(value, type === "from" ? fromCurrency : toCurrency, type === "from" ? toCurrency : fromCurrency, rates);
         field.value = convertedAmount.toFixed(6);
     }
     function processData(data) {
@@ -57,20 +57,20 @@ if ('serviceWorker' in navigator) {
         fromSelect.addEventListener('change', () => {
             convertCurrency(1, fromSelect.value, toSelect.value, rates);
             updateDisplayContent(exchangeRateElement, fromSelect, toSelect, rates);
-            updateAmounts(toAmount, "from", fromSelect, toSelect, rates);
+            updateAmounts(fromAmount.value, toAmount, "from", fromSelect, toSelect, rates);
         });
 
         toSelect.addEventListener('change', () => {
             updateDisplayContent(exchangeRateElement, fromSelect, toSelect, rates);
-            updateAmounts(fromAmount, "to", fromSelect, toSelect, rates);
+            updateAmounts(toAmount.value, fromAmount, "to", fromSelect, toSelect, rates);
         });
 
         fromAmount.addEventListener('input', () => {
-            updateAmounts(toAmount, "from", fromSelect, toSelect, rates);
+            updateAmounts(e.target.value, toAmount, "from", fromSelect, toSelect, rates);
         });
 
         toAmount.addEventListener('input', () => {
-            updateAmounts(fromAmount, "to", fromSelect, toSelect, rates);
+            updateAmounts(e.target.value, fromAmount, "to", fromSelect, toSelect, rates);
         });
     }
     window.addEventListener('load', () => {
