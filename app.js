@@ -95,7 +95,7 @@ if ('serviceWorker' in navigator) {
                     .then(response => response.json())
                     .then(data => {
                         localStorage.setItem('currencyData' + new Date().toLocaleDateString(), JSON.stringify(data));
-                        localStorage.setItem('currencyFetchTime' + new Date().getTime());
+                        localStorage.setItem('currencyFetchTime', new Date().getTime());
                         processData(data);
                     })
                     .catch(error => {
