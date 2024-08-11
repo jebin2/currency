@@ -4,7 +4,7 @@ if ('serviceWorker' in navigator) {
         const toCurrency = toSelect.value;
         exchangeRateElement.textContent = `1 ${fromCurrency} = ${convertCurrency(1, fromCurrency, toCurrency, exchangeRates)} ${toCurrency}`;
         
-        document.getElementById("updatInfoDiv").value = new Date(localStorage.getItem('currencyFetchTime')).toLocaleString('en-GB', {
+        document.getElementById("updateInfoDiv").value = new Date(Number(localStorage.getItem('currencyFetchTime'))).toLocaleString('en-GB', {
             day: 'numeric',
             month: 'short',
             year: 'numeric',
