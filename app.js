@@ -57,7 +57,7 @@ if ('serviceWorker' in navigator) {
         fromSelect.addEventListener('change', () => {
             convertCurrency(1, fromSelect.value, toSelect.value, rates);
             updateDisplayContent(exchangeRateElement, fromSelect, toSelect, rates);
-            updateAmounts(fromAmount, "from", fromSelect, toSelect, rates);
+            updateAmounts(toAmount, "from", fromSelect, toSelect, rates);
         });
 
         toSelect.addEventListener('change', () => {
