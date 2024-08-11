@@ -26,6 +26,17 @@ if ('serviceWorker' in navigator) {
 
         return convertedAmount;
     }
+    function updateAmounts(fromSelect, toSelect) {
+        const fromCurrency = fromSelect.value;
+        const toCurrency = toSelect.value;
+
+        if (fromCurrency === toCurrency) {
+            toAmount.value = fromAmount.value;
+        } else {
+            const convertedAmount = convertCurrency(fromAmount.value, fromCurrency, toCurrency, rates);
+            toAmount.value = convertedAmount.toFixed(6);
+        }
+    }
     function processData(data) {
         
         const loadingElement = document.getElementById('loading');
@@ -50,18 +61,20 @@ if ('serviceWorker' in navigator) {
         fromSelect.addEventListener('change', () => {
             convertCurrency(1, fromSelect.value, toSelect.value, rates);
             updateSelectedValue(exchangeRateElement, fromSelect, toSelect, rates);
+            updateAmounts(fromSelect, toSelect);
         });
 
         toSelect.addEventListener('change', () => {
             updateSelectedValue(exchangeRateElement, fromSelect, toSelect, rates);
+            updateAmounts(fromSelect, toSelect);
         });
 
-        fromAmount.addEventListener('input', (event) => {
-            toAmount.value = event.target.value * rates[toSelect.value];
+        fromAmount.addEventListener('input', () => {
+            updateAmounts(fromSelect, toSelect);
         });
 
         toAmount.addEventListener('input', (event) => {
-            fromAmount.value =  event.target.value / rates[toSelect.value];
+            updateAmounts(fromSelect, toSelect);
         });
     }
     window.addEventListener('load', () => {
