@@ -3,6 +3,15 @@ if ('serviceWorker' in navigator) {
         const fromCurrency = fromSelect.value;
         const toCurrency = toSelect.value;
         exchangeRateElement.textContent = `1 ${fromCurrency} = ${convertCurrency(1, fromCurrency, toCurrency, exchangeRates)} ${toCurrency}`;
+        
+        document.getElementById("updatInfoDiv").value = new Date(localStorage.getItem('currencyFetchTime')).toLocaleString('en-GB', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        });
     }
 
     function convertCurrency(amount, fromCurrency, toCurrency, rates) {
@@ -76,7 +85,9 @@ if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/currency/service-worker.js')
             .then(registration => {
                 const currencyData = localStorage.getItem('currencyData' + new Date().toLocaleDateString());
-                if(currencyData) {
+                let hasOldData = Object.keys(localStorage)[0];
+                hasOldData = hasOldData ? hasOldData.includes("currencyData") : false;
+                if(currencyData || (!navigator.onLine && hasOldData)) {
                     processData(JSON.parse(currencyData));
                 } else {
                     localStorage.clear();
@@ -84,6 +95,7 @@ if ('serviceWorker' in navigator) {
                     .then(response => response.json())
                     .then(data => {
                         localStorage.setItem('currencyData' + new Date().toLocaleDateString(), JSON.stringify(data));
+                        localStorage.setItem('currencyFetchTime' + new Date().getTime());
                         processData(data);
                     })
                     .catch(error => {
