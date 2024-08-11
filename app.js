@@ -26,7 +26,7 @@ if ('serviceWorker' in navigator) {
 
         return convertedAmount;
     }
-    function updateAmounts(fromSelect, toSelect, rates) {
+    function updateAmounts(fromAmount, toAmount, fromSelect, toSelect, rates) {
         const fromCurrency = fromSelect.value;
         const toCurrency = toSelect.value;
 
@@ -61,20 +61,20 @@ if ('serviceWorker' in navigator) {
         fromSelect.addEventListener('change', () => {
             convertCurrency(1, fromSelect.value, toSelect.value, rates);
             updateSelectedValue(exchangeRateElement, fromSelect, toSelect, rates);
-            updateAmounts(fromSelect, toSelect, rates);
+            updateAmounts(fromAmount, toAmount, fromSelect, toSelect, rates);
         });
 
         toSelect.addEventListener('change', () => {
             updateSelectedValue(exchangeRateElement, fromSelect, toSelect, rates);
-            updateAmounts(fromSelect, toSelect, rates);
+            updateAmounts(fromAmount, toAmount, fromSelect, toSelect, rates);
         });
 
         fromAmount.addEventListener('input', () => {
-            updateAmounts(fromSelect, toSelect, rates);
+            updateAmounts(fromAmount, toAmount, fromSelect, toSelect, rates);
         });
 
         toAmount.addEventListener('input', () => {
-            updateAmounts(fromSelect, toSelect, rates);
+            updateAmounts(fromAmount, toAmount, fromSelect, toSelect, rates);
         });
     }
     window.addEventListener('load', () => {
