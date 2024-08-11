@@ -85,9 +85,10 @@ if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/currency/service-worker.js')
             .then(registration => {
                 const currencyData = localStorage.getItem('currencyData' + new Date().toLocaleDateString());
-                let hasOldData = Object.keys(localStorage)[0];
-                hasOldData = hasOldData ? hasOldData.includes("currencyData") : false;
-                if(currencyData || (!navigator.onLine && hasOldData)) {
+                if(!currencyData && !navigator.onLine) {
+                    currencyData = localStorage.getItem(Object.keys(localStorage)[0]);
+                }
+                if(currencyData) {
                     processData(JSON.parse(currencyData));
                 } else {
                     localStorage.clear();
