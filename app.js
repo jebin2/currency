@@ -66,7 +66,7 @@ if ('serviceWorker' in navigator) {
         });
 
         fromAmount.addEventListener('input', () => {
-            updateAmounts(fromAmount, "from", fromSelect, toSelect, rates);
+            updateAmounts(toAmount, "from", fromSelect, toSelect, rates);
         });
 
         toAmount.addEventListener('input', () => {
