@@ -65,11 +65,11 @@ if ('serviceWorker' in navigator) {
             updateAmounts(toAmount.value, fromAmount, "to", fromSelect, toSelect, rates);
         });
 
-        fromAmount.addEventListener('input', () => {
+        fromAmount.addEventListener('input', (e) => {
             updateAmounts(e.target.value, toAmount, "from", fromSelect, toSelect, rates);
         });
 
-        toAmount.addEventListener('input', () => {
+        toAmount.addEventListener('input', (e) => {
             updateAmounts(e.target.value, fromAmount, "to", fromSelect, toSelect, rates);
         });
     }
