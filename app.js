@@ -15,8 +15,11 @@ if ('serviceWorker' in navigator) {
     }
 
     function convertCurrency(amount, fromCurrency, toCurrency, rates) {
+        if(!amount) {
+            return 0;
+        }
         if (fromCurrency === toCurrency) {
-            return amount % 1 === 0 ? amount : amount.toFixed(6);
+            return parseFloat(amount % 1 === 0 ? amount : amount.toFixed(6));
         }
 
         const fromRate = rates[fromCurrency];
@@ -32,7 +35,7 @@ if ('serviceWorker' in navigator) {
             rates[cur] = rates[cur] / fromRate;
         }
 
-        return convertedAmount % 1 === 0 ? convertedAmount : convertedAmount.toFixed(6);
+        return parseFloat(convertedAmount % 1 === 0 ? convertedAmount : convertedAmount.toFixed(6));
     }
     function updateAmounts(value, field, type, fromSelect, toSelect, rates) {
         const fromCurrency = fromSelect.value;
