@@ -86,9 +86,19 @@ if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/currency/service-worker.js')
             .then(registration => {
-                const currencyData = localStorage.getItem('currencyData' + new Date().toLocaleDateString());
-                if(!currencyData && !navigator.onLine) {
-                    currencyData = localStorage.getItem(Object.keys(localStorage)[0]);
+                let fetchedDate = new Date(Number(localStorage.getItem('currencyFetchTime'))).toLocaleString('en-GB', {
+                    day: 'numeric',
+                    month: 'numeric',
+                    year: 'numeric'
+                })
+                let today = new Date().toLocaleString('en-GB', {
+                    day: 'numeric',
+                    month: 'numeric',
+                    year: 'numeric'
+                });
+                const currencyData = localStorage.getItem('currencyData');
+                if(fetchedDate !== today && navigator.onLine) {
+                    currencyData = null;
                 }
                 if(currencyData) {
                     processData(JSON.parse(currencyData));
@@ -97,7 +107,7 @@ if ('serviceWorker' in navigator) {
                     fetch('https://jeapis.netlify.app/.netlify/functions/currency?from=USD&to=INR')
                     .then(response => response.json())
                     .then(data => {
-                        localStorage.setItem('currencyData' + new Date().toLocaleDateString(), JSON.stringify(data));
+                        localStorage.setItem('currencyData', JSON.stringify(data));
                         localStorage.setItem('currencyFetchTime', new Date().getTime());
                         processData(data);
                     })
