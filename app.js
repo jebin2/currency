@@ -96,7 +96,7 @@ if ('serviceWorker' in navigator) {
                     month: 'numeric',
                     year: 'numeric'
                 });
-                const currencyData = localStorage.getItem('currencyData');
+                let currencyData = localStorage.getItem('currencyData');
                 if(fetchedDate !== today && navigator.onLine) {
                     currencyData = null;
                 }
