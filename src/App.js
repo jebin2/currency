@@ -208,14 +208,9 @@ function App() {
                 </a>
             </div>
             <ReactPWAPrompt
-                promptOnVisit={0} // Show on the first visit
-                timesToShow={1} // Show the prompt only once
-                minOfflineTime={0} // Minimum offline time to wait before showing the prompt
-                copyTitle="Install Our App"
-                copyBody="Add our app to your home screen for a better experience."
-                copyClose="Close"
-                copyInstall="Install"
-                className="custom-ios-pwa-prompt"
+                timesToShow={1}
+                promptOnVisit={1}
+                appIconPath="/currency/favicon.ico"
             />
         </>
     );
