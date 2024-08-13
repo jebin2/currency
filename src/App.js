@@ -12,9 +12,9 @@ function App() {
     const [displaySelectedRates, setDisplaySelectedRates] = useState("");
     const [updatedTime, setUpdatedTime] = useState("");
     const [loading, setLoading] = useState(true);
-    const [fromCurrencyValue, setFromCurrencyValue] = useState("USD");
+    const [fromCurrencyValue, setFromCurrencyValue] = useState(localStorage.getItem('fromCur') ? localStorage.getItem('fromCur') : "USD");
     const [fromCurrencyInputValue, setFromCurrencyInputValue] = useState("0");
-    const [toCurrencyValue, setToCurrencyValue] = useState("INR");
+    const [toCurrencyValue, setToCurrencyValue] = useState(localStorage.getItem('toCur') ? localStorage.getItem('toCur') : "INR");
     const [toCurrencyInputValue, setToCurrencyInputValue] = useState("0");
     const [typeField, setTypeField] = useState("from");
 
@@ -22,6 +22,8 @@ function App() {
         const exchangeRates = JSON.parse(localStorage.getItem('currencyData'))?.rates;
         if (exchangeRates && exchangeRates[fromCurrencyValue] && exchangeRates[toCurrencyValue]) {
             updateDisplayContent();
+            localStorage.setItem('fromCur', fromCurrencyValue);
+            localStorage.setItem('toCur', toCurrencyValue);
         }
     }, [fromCurrencyValue, toCurrencyValue]);
 
@@ -55,6 +57,7 @@ function App() {
     const processData = (data) => {
         setSupportedCurrencies(Object.keys(data.rates));
         updateDisplayContent();
+        handleCurrencyInputChange({target : {value : 1}}, "from");
     }
 
     useEffect(() => {
