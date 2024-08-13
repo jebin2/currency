@@ -5,6 +5,7 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { styled } from '@mui/material/styles';
 import { Popper } from '@mui/material';
+import ReactPWAPrompt from 'react-ios-pwa-prompt';
 
 function App() {
     const [supportedCurrencies, setSupportedCurrencies] = useState([]);
@@ -206,6 +207,7 @@ function App() {
                     <img src={githublogo} alt="GitHub logo" />
                 </a>
             </div>
+            <ReactPWAPrompt />
         </>
     );
 }
