@@ -57,7 +57,7 @@ function App() {
     const processData = (data) => {
         setSupportedCurrencies(Object.keys(data.rates));
         updateDisplayContent();
-        handleCurrencyInputChange({target : {value : 1}}, "from");
+        handleCurrencyInputChange({ target: { value: 1 } }, "from");
     }
 
     useEffect(() => {
@@ -103,14 +103,13 @@ function App() {
                 color: 'white'
             },
             '& .MuiAutocomplete-option.Mui-focused': {
-                backgroundColor: '#4caf50 !important',
                 color: 'white',
                 boxShadow: "0 0 8px rgba(0, 255, 0, 0.5)",
                 outline: "none",
             }
         },
     }));
-    
+
     const CustomTextField = styled(TextField)(({ theme }) => ({
         '& .MuiInputBase-root': {
             borderRadius: "2px",
@@ -120,8 +119,9 @@ function App() {
             fontSize: '1rem',
             width: '100%',
             paddingRight: '0px !important',
-            '&:hover .MuiOutlinedInput-notchedOutline, &.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: "#4caf50",
+            border: "1px solid white",
+            '&:hover, &.Mui-focused': {
+                border: '1px solid #002700',
                 boxShadow: "0 0 8px rgba(0, 255, 0, 0.5)",
                 outline: "none",
             },
@@ -131,12 +131,29 @@ function App() {
                 }
             },
         },
+        '& .MuiAutocomplete-inputRoot': {
+            border: 'none',
+        },
+        '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+                borderColor: 'transparent', // Default border color
+            },
+            '&:hover fieldset': {
+                borderColor: 'transparent', // Remove border on hover
+            },
+            '&.Mui-focused fieldset': {
+                borderColor: 'transparent', // Remove border on focus
+            },
+            '&.Mui-focused:hover fieldset': {
+                borderColor: 'transparent',
+            },
+        },
     }));
 
     const handleCurrencyInputChange = (e, type) => {
         setTypeField(type);
         if (isNaN(e.target.value)) return;
-        
+
         const value = e.target.value;
         if (type === "from") {
             setFromCurrencyInputValue(value);
@@ -160,7 +177,7 @@ function App() {
                             {['from', 'to'].map((type) => (
                                 <div className="form-group" key={type}>
                                     <Autocomplete
-                                    disableClearable
+                                        disableClearable
                                         disablePortal
                                         options={supportedCurrencies}
                                         value={type === 'from' ? fromCurrencyValue : toCurrencyValue}
@@ -176,7 +193,6 @@ function App() {
                                         size='small'
                                         sx={{
                                             color: "white",
-                                            border: "1px solid white",
                                             width: "80px",
                                             borderRadius: "2px",
                                         }}
@@ -191,7 +207,6 @@ function App() {
                                         autoFocus={typeField === type}
                                         sx={{
                                             color: "white",
-                                            border: "1px solid white",
                                             width: "200px",
                                             borderRadius: "2px",
                                         }}
@@ -206,7 +221,7 @@ function App() {
                 )}
             </div>
             <div className="footer">
-                <a href="https://github.com/jebin2/apis" target="_blank" rel="noopener noreferrer">
+                <a href="https://github.com/jebin2" target="_blank" rel="noopener noreferrer">
                     <img src={githublogo} alt="GitHub logo" />
                 </a>
             </div>

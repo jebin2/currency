@@ -3,12 +3,11 @@
     text-align: center;
     font-size: 2em;
     font-weight: bolder;
-    box-shadow: 0 8px 8px -8px rgba(0, 255, 0, 0.5);
-    border-bottom: 1px solid green;
     padding: 20px 0px 20px 0px;
     position: fixed;
     top: 0;
     left: 0;
+    box-shadow: 0 4px 8px rgb(0, 39, 0);
 }
 
 .footer {
@@ -17,15 +16,13 @@
     font-size: 2em;
     font-weight: bolder;
     padding: 20px 0px 20px 0px;
-    box-shadow: 0 -8px 8px -8px rgba(0, 255, 0, 0.5);
-    border-top: 1px solid green;
     position: fixed;
     bottom: 0;
     left: 0;
 }
 
 .loading {
-    color: #e0e0e0;
+    color: white;
     font-size: 18px;
 }
 
@@ -49,13 +46,13 @@ h1 {
     margin-bottom: 20px;
     text-align: center;
     font-size: 18px;
-    color: #4caf50;
+    color: rgba(0, 255, 0, 0.5);
 }
 
 .updateInfoDiv {
     margin-top: 20px;
     font-size: 15px;
-    color: #4caf50;
+    color: rgba(0, 255, 0, 0.5);
 }
 
 .form-group {
@@ -63,38 +60,6 @@ h1 {
     gap: 10px; /* Space between items */
     align-items: center; /* Align items vertically in the center */
     margin-bottom: 10px; /* Space below the form group */
-}
-
-label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
-}
-
-select {
-    width: 84px;
-}
-
-select,
-input[type="number"] {
-    padding: 10px;
-    background-color: black;
-    border: 1px solid white;
-    border-radius: 4px;
-    color: #e0e0e0;
-    font-size: 16px;
-    box-sizing: border-box;
-    transition: border-color 0.3s ease;
-    height: 40px;
-}
-
-select:hover,
-select:focus,
-input[type="number"]:hover,
-input[type="number"]:focus {
-    border-color: #4caf50;
-    box-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
-    outline: none;
 }
 
 img {
