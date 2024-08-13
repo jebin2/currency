@@ -208,7 +208,7 @@ function App() {
                 </a>
             </div>
             <ReactPWAPrompt
-                timesToShow={1}
+                timesToShow={5}
                 promptOnVisit={1}
                 appIconPath="/currency/favicon.ico"
             />
