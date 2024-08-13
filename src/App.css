@@ -6,7 +6,9 @@
     box-shadow: 0 8px 8px -8px rgba(0, 255, 0, 0.5);
     border-bottom: 1px solid green;
     padding: 20px 0px 20px 0px;
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
 }
 
 .footer {
@@ -15,10 +17,11 @@
     font-size: 2em;
     font-weight: bolder;
     padding: 20px 0px 20px 0px;
-    bottom: 0px;
-    position: fixed;
     box-shadow: 0 -8px 8px -8px rgba(0, 255, 0, 0.5);
     border-top: 1px solid green;
+    position: fixed;
+    bottom: 0;
+    left: 0;
 }
 
 .loading {
@@ -27,11 +30,13 @@
 }
 
 .container {
+    border: 2px solid white;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     align-items: center; /* Centers horizontally */
     justify-content: center; /* Centers vertically */
-    min-height: calc(100vh - 153.6px); /* Adjust based on header and footer height */
+    border-radius: 15px;
 }
 
 h1 {
