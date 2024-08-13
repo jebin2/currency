@@ -1,14 +1,37 @@
+.header {
+    width: 100%;
+    text-align: center;
+    font-size: 2em;
+    font-weight: bolder;
+    box-shadow: 0 8px 8px -8px rgba(0, 255, 0, 0.5);
+    border-bottom: 1px solid green;
+    padding: 20px 0px 20px 0px;
+    position: relative;
+}
+
+.footer {
+    width: 100%;
+    text-align: center;
+    font-size: 2em;
+    font-weight: bolder;
+    padding: 20px 0px 20px 0px;
+    bottom: 0px;
+    position: fixed;
+    box-shadow: 0 -8px 8px -8px rgba(0, 255, 0, 0.5);
+    border-top: 1px solid green;
+}
+
 .loading {
-        text-align: center;
-        color: #e0e0e0;
-        font-size: 18px;
-    }
+    color: #e0e0e0;
+    font-size: 18px;
+}
+
 .container {
-    padding: 20px;
-    background: black;
-    border: 1px solid #333;
-    border-radius: 8px;
-    box-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centers horizontally */
+    justify-content: center; /* Centers vertically */
+    min-height: calc(100vh - 153.6px); /* Adjust based on header and footer height */
 }
 
 h1 {
@@ -24,8 +47,17 @@ h1 {
     color: #4caf50;
 }
 
+.updateInfoDiv {
+    margin-top: 20px;
+    font-size: 15px;
+    color: #4caf50;
+}
+
 .form-group {
-    margin-bottom: 20px;
+    display: flex;
+    gap: 10px; /* Space between items */
+    align-items: center; /* Align items vertically in the center */
+    margin-bottom: 10px; /* Space below the form group */
 }
 
 label {
@@ -33,9 +65,11 @@ label {
     margin-bottom: 8px;
     font-weight: bold;
 }
+
 select {
     width: 84px;
 }
+
 select,
 input[type="number"] {
     padding: 10px;
@@ -57,28 +91,7 @@ input[type="number"]:focus {
     box-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
     outline: none;
 }
+
 img {
     width: 20px;
-}
-.header {
-    padding: 20px 0px 20px 0px;
-    top: 0px;
-    position: fixed;
-    width: 100%;
-    box-shadow: 0 8px 8px -8px rgba(0, 255, 0, 0.5);
-    font-size: 2rem;
-    font-weight: bolder;
-    border-bottom: 1px solid green;
-}
-
-.footer {
-    padding: 20px 0px 20px 0px;
-    bottom: 0px;
-    position: fixed;
-    width: 100%;
-    box-shadow: 0 -8px 8px -8px rgba(0, 255, 0, 0.5);
-    border-top: 1px solid green;
-}
-.updateInfoDiv {
-    font-size: 15px;
 }
