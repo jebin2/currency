@@ -97,23 +97,28 @@ if ('serviceWorker' in navigator) {
                     year: 'numeric'
                 });
                 let currencyData = localStorage.getItem('currencyData');
-                if(fetchedDate !== today && navigator.onLine) {
+                if(fetchedDate !== today) {
                     currencyData = null;
                 }
                 if(currencyData) {
                     processData(JSON.parse(currencyData));
                 } else {
-                    localStorage.clear();
                     fetch('https://jeapis.netlify.app/.netlify/functions/currency?from=USD&to=INR')
                     .then(response => response.json())
                     .then(data => {
+                        localStorage.clear();
                         localStorage.setItem('currencyData', JSON.stringify(data));
                         localStorage.setItem('currencyFetchTime', new Date().getTime());
                         processData(data);
                     })
                     .catch(error => {
-                        console.error('Error fetching data:', error);
-                        document.getElementById('loading').textContent = 'Failed to load data. Please try again later.';
+                        currencyData = localStorage.getItem('currencyData');
+                        if(currencyData) {
+                            processData(JSON.parse(currencyData));
+                        } else {
+                            console.error('Error fetching data:', error);
+                            document.getElementById('loading').textContent = 'Failed to load data. Please try again later.';
+                        }
                     });
                 }
             })
