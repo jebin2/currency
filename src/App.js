@@ -140,6 +140,8 @@ function App() {
             border: 'none',
         },
         '& .MuiOutlinedInput-root': {
+            fontWeight: "600 !important",
+            letterSpacing: "0.1rem !important",
             '& fieldset': {
                 borderColor: 'transparent', // Default border color
             },
@@ -202,7 +204,11 @@ function App() {
                                             borderRadius: "2px",
                                         }}
                                         renderInput={(params) => (
-                                            <CustomTextField {...params} variant="outlined" size="small" />
+                                            <CustomTextField {...params} variant="outlined" size="small"
+                                        sx={{
+                                            fontWeight: "600 !important",
+                                            letterSpacing: "0.1rem !important",
+                                        }} />
                                         )}
                                         PopperComponent={CustomPopper}
                                     />
@@ -214,6 +220,8 @@ function App() {
                                             color: "white",
                                             width: "200px",
                                             borderRadius: "2px",
+                                            fontWeight: "600 !important",
+                                            letterSpacing: "0.1rem !important",
                                         }}
                                         variant="outlined"
                                         size="small"
