@@ -205,10 +205,10 @@ function App() {
                                         }}
                                         renderInput={(params) => (
                                             <CustomTextField {...params} variant="outlined" size="small"
-                                        sx={{
-                                            fontWeight: "600 !important",
-                                            letterSpacing: "0.1rem !important",
-                                        }} />
+                                                sx={{
+                                                    fontWeight: "600 !important",
+                                                    letterSpacing: "0.1rem !important",
+                                                }} />
                                         )}
                                         PopperComponent={CustomPopper}
                                     />
