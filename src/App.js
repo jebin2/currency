@@ -143,13 +143,13 @@ function App() {
             fontWeight: "600 !important",
             letterSpacing: "0.1rem !important",
             '& fieldset': {
-                borderColor: 'transparent', // Default border color
+                borderColor: 'transparent',
             },
             '&:hover fieldset': {
-                borderColor: 'transparent', // Remove border on hover
+                borderColor: 'transparent',
             },
             '&.Mui-focused fieldset': {
-                borderColor: 'transparent', // Remove border on focus
+                borderColor: 'transparent',
             },
             '&.Mui-focused:hover fieldset': {
                 borderColor: 'transparent',
