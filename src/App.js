@@ -17,7 +17,7 @@ function App() {
     const [fromCurrencyInputValue, setFromCurrencyInputValue] = useState("0");
     const [toCurrencyValue, setToCurrencyValue] = useState(localStorage.getItem('toCur') ? localStorage.getItem('toCur') : "INR");
     const [toCurrencyInputValue, setToCurrencyInputValue] = useState("0");
-    const [typeField, setTypeField] = useState("from");
+    const [typeField, setTypeField] = useState("");
 
     useEffect(() => {
         const exchangeRates = JSON.parse(localStorage.getItem('currencyData'))?.rates;
