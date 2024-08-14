@@ -8,6 +8,7 @@ import { Popper } from '@mui/material';
 import ReactPWAPrompt from 'react-ios-pwa-prompt';
 
 function App() {
+    const [error, setError] = useState("Loading...");
     const [supportedCurrencies, setSupportedCurrencies] = useState([]);
     const [displaySelectedRates, setDisplaySelectedRates] = useState("");
     const [updatedTime, setUpdatedTime] = useState("");
@@ -67,7 +68,7 @@ function App() {
                 const today = new Date().toLocaleDateString('en-GB');
                 let currencyData = localStorage.getItem('currencyData');
 
-                if (fetchedDate !== today) {
+                if (fetchedDate === today) {
                     currencyData = null;
                 }
 
@@ -84,8 +85,12 @@ function App() {
                     processData(data);
                 }
             } catch (error) {
-                console.error('Error fetching currency data:', error);
-                document.getElementById('loading').textContent = 'Failed to load data. Please try again later.';
+                let currencyData = localStorage.getItem('currencyData');
+                if (currencyData) {
+                    processData(JSON.parse(currencyData));
+                } else {
+                    setError("Please connect to internet and try again");
+                }
             } finally {
                 setLoading(false);
             }
@@ -168,8 +173,8 @@ function App() {
         <>
             <div className="header">Currency Rates</div>
             <div className="container">
-                {loading ? (
-                    <div id="loading" className="loading">Loading...</div>
+                {loading || error !== "Loading..." ? (
+                    <div id="loading" className="loading">{error}</div>
                 ) : (
                     <>
                         <div className="exchange-rate">{displaySelectedRates}</div>
