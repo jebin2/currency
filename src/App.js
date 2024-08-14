@@ -238,11 +238,13 @@ function App() {
                     <img src={githublogo} alt="GitHub logo" />
                 </a>
             </div>
-            <ReactPWAPrompt
-                timesToShow={5}
-                promptOnVisit={1}
-                appIconPath="/currency/favicon.ico"
-            />
+            <div className='promtPWA'>
+                <ReactPWAPrompt
+                    timesToShow={5}
+                    promptOnVisit={1}
+                    appIconPath="/currency/favicon.ico"
+                />
+            </div>
         </>
     );
 }
