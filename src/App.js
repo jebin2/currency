@@ -68,7 +68,7 @@ function App() {
                 const today = new Date().toLocaleDateString('en-GB');
                 let currencyData = localStorage.getItem('currencyData');
 
-                if (fetchedDate === today) {
+                if (fetchedDate !== today) {
                     currencyData = null;
                 }
 
