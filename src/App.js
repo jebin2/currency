@@ -58,7 +58,7 @@ function App() {
     const processData = (data) => {
         setSupportedCurrencies(Object.keys(data.rates));
         updateDisplayContent();
-        handleCurrencyInputChange({ target: { value: 1 } }, "from");
+        handleCurrencyInputChange({ target: { value: 1 } }, "from", 'ignoreFocus');
     }
 
     useEffect(() => {
@@ -157,8 +157,8 @@ function App() {
         },
     }));
 
-    const handleCurrencyInputChange = (e, type) => {
-        setTypeField(type);
+    const handleCurrencyInputChange = (e, type, ignoreFocus) => {
+        setTypeField(ignoreFocus === "ignoreFocus" ? "" : type);
         if (isNaN(e.target.value)) return;
 
         const value = e.target.value;
