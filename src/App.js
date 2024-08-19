@@ -61,27 +61,39 @@ function App() {
         handleCurrencyInputChange({ target: { value: 1 } }, "from", 'ignoreFocus');
     }
 
+    const fetchLatestData = async () => {
+        try {
+            const response = await fetch('https://jeapis.netlify.app/.netlify/functions/currency?from=USD&to=INR');
+            const data = await response.json();
+            for (let cur in data.rates) {
+                data.rates[cur] = data.rates[cur].toFixed(2);
+            }
+            localStorage.setItem('currencyData', JSON.stringify(data));
+            localStorage.setItem('currencyFetchTime', new Date().getTime());
+            return data;
+        } catch (error) {
+            return null;
+        }
+    }
+
     useEffect(() => {
         async function fetchData() {
             try {
+                let currencyData = localStorage.getItem('currencyData');
                 const fetchedDate = new Date(Number(localStorage.getItem('currencyFetchTime'))).toLocaleDateString('en-GB');
                 const today = new Date().toLocaleDateString('en-GB');
-                let currencyData = localStorage.getItem('currencyData');
-
-                if (fetchedDate !== today) {
-                    currencyData = null;
-                }
-
+    
                 if (currencyData) {
                     processData(JSON.parse(currencyData));
-                } else {
-                    const response = await fetch('https://jeapis.netlify.app/.netlify/functions/currency?from=USD&to=INR');
-                    const data = await response.json();
-                    for (let cur in data.rates) {
-                        data.rates[cur] = data.rates[cur].toFixed(2);
+                    if (fetchedDate !== today) {
+                        fetchLatestData().then(data => {
+                            if (data) {
+                                processData(data);
+                            }
+                        });
                     }
-                    localStorage.setItem('currencyData', JSON.stringify(data));
-                    localStorage.setItem('currencyFetchTime', new Date().getTime());
+                } else {
+                    const data = await fetchLatestData();
                     processData(data);
                 }
             } catch (error) {
@@ -95,7 +107,6 @@ function App() {
                 setLoading(false);
             }
         }
-
         fetchData();
     }, []);
 
