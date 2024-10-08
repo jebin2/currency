@@ -1,12 +1,12 @@
 {
   "files": {
-    "main.css": "/currency/static/css/main.16dd47aa.css",
-    "main.js": "/currency/static/js/main.5223ee6c.js",
+    "main.css": "/currency/static/css/main.09a8fa7f.css",
+    "main.js": "/currency/static/js/main.c9346e5b.js",
     "service-worker.js": "/currency/service-worker.js",
     "index.html": "/currency/index.html"
   },
   "entrypoints": [
-    "static/css/main.16dd47aa.css",
-    "static/js/main.5223ee6c.js"
+    "static/css/main.09a8fa7f.css",
+    "static/js/main.c9346e5b.js"
   ]
 }
