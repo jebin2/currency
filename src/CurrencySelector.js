@@ -127,10 +127,10 @@ const CurrencySelector = ({ type, fromCurrencyValue, toCurrencyValue, setFromCur
                                 key={currency}
                                 onClick={() => {
                                     if (type === 'from') {
-                                        setFromCurrencyValue(currency);
+                                        setFromCurrencyValue(currency.split(" - ")[0]);
                                         setToCurrencyInputValue(convertCurrency(fromCurrencyInputValue, currency, toCurrencyValue));
                                     } else {
-                                        setToCurrencyValue(currency);
+                                        setToCurrencyValue(currency.split(" - ")[0]);
                                         setToCurrencyInputValue(convertCurrency(fromCurrencyInputValue, fromCurrencyValue, currency));
                                     }
                                     handleClose();
