@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { styled } from '@mui/material/styles';
 import { TextField, Autocomplete, Popper } from '@mui/material';
 import ReactPWAPrompt from 'react-ios-pwa-prompt';
@@ -82,7 +82,7 @@ function App() {
     const [updatedTime, setUpdatedTime] = useState("");
     const [loading, setLoading] = useState(true);
     const [fromCurrencyValue, setFromCurrencyValue] = useState(localStorage.getItem('fromCur') || "USD");
-    const [fromCurrencyInputValue, setFromCurrencyInputValue] = useState("0");
+    const [fromCurrencyInputValue, setFromCurrencyInputValue] = useState("1");
     const [toCurrencyValue, setToCurrencyValue] = useState(localStorage.getItem('toCur') || "INR");
     const [toCurrencyInputValue, setToCurrencyInputValue] = useState("0");
     const [typeField, setTypeField] = useState("");
@@ -96,19 +96,7 @@ function App() {
         }
     }, [fromCurrencyValue, toCurrencyValue]);
 
-    const updateDisplayContent = () => {
-        setDisplaySelectedRates(`1 ${fromCurrencyValue} = ${convertCurrency(1)} ${toCurrencyValue}`);
-        setUpdatedTime("Updated on " + new Date(Number(localStorage.getItem('currencyFetchTime'))).toLocaleString('en-GB', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
-        }));
-    }
-
-    const convertCurrency = (amount, from = fromCurrencyValue, to = toCurrencyValue) => {
+    const convertCurrency = useCallback((amount, from = fromCurrencyValue, to = toCurrencyValue) => {
         const exchangeRates = JSON.parse(localStorage.getItem('currencyData'))?.rates;
         if (!amount || !exchangeRates) return 0;
         from = (from + "").includes(" - ") ? from.split(" - ")[0] : from;
@@ -123,21 +111,21 @@ function App() {
         const convertedAmount = amount * (toRate / fromRate);
         const finalVal = Number(convertedAmount);
         return finalVal % 1 === 0 ? finalVal : finalVal.toFixed(2);
-    }
+    }, [fromCurrencyValue, toCurrencyValue]); // Dependencies
 
-    const processData = (data) => {
-        var curr = [];
-        for (const key in data.supportedCurrency) {
-            if (data.supportedCurrency.hasOwnProperty(key)) {
-                curr.push(key + " - " + data.supportedCurrency[key]);
-            }
-        }
-        setSupportedCurrencies(curr);
-        updateDisplayContent();
-        handleCurrencyInputChange({ target: { value: 1 } }, "from", 'ignoreFocus');
-    }
+    const updateDisplayContent = useCallback(() => {
+        setDisplaySelectedRates(`1 ${fromCurrencyValue} = ${convertCurrency(1)} ${toCurrencyValue}`);
+        setUpdatedTime("Updated on " + new Date(Number(localStorage.getItem('currencyFetchTime'))).toLocaleString('en-GB', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        }));
+    }, [fromCurrencyValue, toCurrencyValue, convertCurrency]);
 
-    const fetchLatestData = async () => {
+    const fetchLatestData = useCallback(async () => {
         try {
             const response = await fetch('https://jeapis.netlify.app/.netlify/functions/currency?from=USD&to=INR');
             const data = await response.json();
@@ -150,7 +138,34 @@ function App() {
         } catch (error) {
             return null;
         }
-    }
+    }, []);
+
+    const handleCurrencyInputChange = useCallback((e, type, ignoreFocus) => {
+        setTypeField(ignoreFocus === "ignoreFocus" ? "" : type);
+        if (isNaN(e.target.value)) return;
+
+        const value = e.target.value;
+        if (type === "from") {
+            setFromCurrencyInputValue(value);
+            setToCurrencyInputValue(convertCurrency(value));
+        } else {
+            setToCurrencyInputValue(value);
+            setFromCurrencyInputValue(convertCurrency(value, toCurrencyValue, fromCurrencyValue));
+        }
+    }, [fromCurrencyValue, toCurrencyValue, convertCurrency]); // Add dependencies
+
+    const processData = useCallback((data) => {
+        var curr = [];
+        for (const key in data.supportedCurrency) {
+            if (data.supportedCurrency.hasOwnProperty(key)) {
+                curr.push(key + " - " + data.supportedCurrency[key]);
+            }
+        }
+        setSupportedCurrencies(curr);
+        updateDisplayContent();
+        const initialValue = fromCurrencyInputValue || 1;
+        handleCurrencyInputChange({ target: { value: initialValue } }, "from", 'ignoreFocus');
+    }, [updateDisplayContent, handleCurrencyInputChange]);
 
     useEffect(() => {
         async function fetchData() {
@@ -184,21 +199,7 @@ function App() {
             }
         }
         fetchData();
-    }, []);
-
-    const handleCurrencyInputChange = (e, type, ignoreFocus) => {
-        setTypeField(ignoreFocus === "ignoreFocus" ? "" : type);
-        if (isNaN(e.target.value)) return;
-
-        const value = e.target.value;
-        if (type === "from") {
-            setFromCurrencyInputValue(value);
-            setToCurrencyInputValue(convertCurrency(value));
-        } else {
-            setToCurrencyInputValue(value);
-            setFromCurrencyInputValue(convertCurrency(value, toCurrencyValue, fromCurrencyValue));
-        }
-    };
+    }, [fetchLatestData, processData, setError, setLoading]);
 
     return (
         <RetroContainer>
@@ -258,5 +259,5 @@ function App() {
         </RetroContainer>
     );
 }
-
+const MemoizedCurrencySelector = React.memo(CurrencySelector);
 export default App;

@@ -123,7 +123,7 @@ const CurrencySelector = ({ type, fromCurrencyValue, toCurrencyValue, setFromCur
                     <RetroList>
                         {filteredCurrencies.map((currency) => (
                             <RetroListItem
-                                button
+                                button="true"
                                 key={currency}
                                 onClick={() => {
                                     if (type === 'from') {
