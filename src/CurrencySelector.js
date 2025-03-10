@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { styled } from '@mui/material/styles';
 import {
     Dialog,
@@ -12,6 +12,7 @@ import {
     IconButton,
 } from '@mui/material';
 import { Search } from '@mui/icons-material';
+import { FixedSizeList } from 'react-window';
 
 // const color = "#FF6B6B";
 const color = "white";
@@ -22,7 +23,8 @@ const RetroDialog = styled(Dialog)({
         border: `4px solid ${color}`,
         borderRadius: '10px',
         color: `${color}`,
-        height: '100%',
+        minHeight: '50vh',  // Avoid full height causing layout shifts
+        maxHeight: '80vh',  // Prevent excessive recalculations
     },
 });
 
@@ -67,6 +69,14 @@ const RetroButton = styled(Button)({
 const RetroIconButton = styled(IconButton)({
     color: '#4ECDC4',
 });
+const MemoizedRetroListItem = React.memo(RetroListItem);
+const MemoizedRetroListItemText = React.memo(RetroListItemText);
+
+const Row = ({ index, style, data }) => (
+    <MemoizedRetroListItem style={style} button onClick={() => data.handleClick(data.items[index])}>
+        <MemoizedRetroListItemText primary={data.items[index]} />
+    </MemoizedRetroListItem>
+);
 
 const CurrencySelector = ({ type, fromCurrencyValue, toCurrencyValue, setFromCurrencyValue, setToCurrencyValue, fromCurrencyInputValue, setToCurrencyInputValue, convertCurrency, supportedCurrencies, RetroTextField }) => {
     const [open, setOpen] = useState(false);
@@ -84,6 +94,16 @@ const CurrencySelector = ({ type, fromCurrencyValue, toCurrencyValue, setFromCur
         setOpen(false);
         setSearchValue('');
     };
+    const handleClick = useCallback((currency) => {
+        if (type === 'from') {
+            setFromCurrencyValue(currency.split(" - ")[0]);
+            setToCurrencyInputValue(convertCurrency(fromCurrencyInputValue, currency, toCurrencyValue));
+        } else {
+            setToCurrencyValue(currency.split(" - ")[0]);
+            setToCurrencyInputValue(convertCurrency(fromCurrencyInputValue, fromCurrencyValue, currency));
+        }
+        handleClose();
+    }, [type, fromCurrencyInputValue, fromCurrencyValue, toCurrencyValue, convertCurrency]);
 
     return (
         <div>
@@ -121,24 +141,14 @@ const CurrencySelector = ({ type, fromCurrencyValue, toCurrencyValue, setFromCur
                         }}
                     />
                     <RetroList>
-                        {filteredCurrencies.map((currency) => (
-                            <RetroListItem
-                                button="true"
-                                key={currency}
-                                onClick={() => {
-                                    if (type === 'from') {
-                                        setFromCurrencyValue(currency.split(" - ")[0]);
-                                        setToCurrencyInputValue(convertCurrency(fromCurrencyInputValue, currency, toCurrencyValue));
-                                    } else {
-                                        setToCurrencyValue(currency.split(" - ")[0]);
-                                        setToCurrencyInputValue(convertCurrency(fromCurrencyInputValue, fromCurrencyValue, currency));
-                                    }
-                                    handleClose();
-                                }}
-                            >
-                                <RetroListItemText primary={currency} />
-                            </RetroListItem>
-                        ))}
+                    <FixedSizeList
+                        height={300} // Set a fixed height for performance
+                        itemSize={40} // Each item takes 40px
+                        itemCount={filteredCurrencies.length}
+                        itemData={{ items: filteredCurrencies, handleClick }}
+                    >
+                        {Row}
+                    </FixedSizeList>
                     </RetroList>
                 </RetroDialogContent>
                 <DialogActions>
