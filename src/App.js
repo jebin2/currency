@@ -5,6 +5,7 @@ import ReactPWAPrompt from 'react-ios-pwa-prompt';
 import githublogo from './images/github-mark-white.png';
 import CurrencySelector from './CurrencySelector';
 
+const MemoizedCurrencySelector = React.memo(CurrencySelector);
 // const color = "#FF6B6B";
 const color = "white";
 
@@ -86,6 +87,7 @@ function App() {
     const [toCurrencyValue, setToCurrencyValue] = useState(localStorage.getItem('toCur') || "INR");
     const [toCurrencyInputValue, setToCurrencyInputValue] = useState("0");
     const [typeField, setTypeField] = useState("");
+    const [isOffline, setIsOffline] = useState(false);
 
     useEffect(() => {
         const exchangeRates = JSON.parse(localStorage.getItem('currencyData'))?.rates;
@@ -115,7 +117,9 @@ function App() {
 
     const updateDisplayContent = useCallback(() => {
         setDisplaySelectedRates(`1 ${fromCurrencyValue} = ${convertCurrency(1)} ${toCurrencyValue}`);
-        setUpdatedTime("Updated on " + new Date(Number(localStorage.getItem('currencyFetchTime'))).toLocaleString('en-GB', {
+        const fetchTime = localStorage.getItem('currencyFetchTime');
+        if (fetchTime) {
+            setUpdatedTime("Updated on " + new Date(Number(fetchTime)).toLocaleString('en-GB', {
             day: 'numeric',
             month: 'short',
             year: 'numeric',
@@ -123,19 +127,31 @@ function App() {
             minute: '2-digit',
             hour12: false
         }));
+        }
     }, [fromCurrencyValue, toCurrencyValue, convertCurrency]);
 
     const fetchLatestData = useCallback(async () => {
         try {
-            const response = await fetch('https://jeapis.netlify.app/.netlify/functions/currency?from=USD&to=INR');
+            const response = await fetch('https://jeapis.netlify.app/.netlify/functions/currency?from=USD&to=INR', {
+                // Add a timeout to the fetch
+                signal: AbortSignal.timeout(5000) // 5 second timeout
+            });
+            
+            if (!response.ok) {
+                throw new Error("Server error");
+            }
+            
             const data = await response.json();
             for (let cur in data.rates) {
                 data.rates[cur] = data.rates[cur].toFixed(2);
             }
             localStorage.setItem('currencyData', JSON.stringify(data));
             localStorage.setItem('currencyFetchTime', new Date().getTime());
+            setIsOffline(false);
             return data;
         } catch (error) {
+            console.log("Fetch error:", error.message);
+            setIsOffline(true);
             return null;
         }
     }, []);
@@ -155,6 +171,10 @@ function App() {
     }, [fromCurrencyValue, toCurrencyValue, convertCurrency]); // Add dependencies
 
     const processData = useCallback((data) => {
+        if (!data || !data.supportedCurrency || !data.rates) {
+            return false;
+        }
+        
         var curr = [];
         for (const key in data.supportedCurrency) {
             if (data.supportedCurrency.hasOwnProperty(key)) {
@@ -165,54 +185,84 @@ function App() {
         updateDisplayContent();
         const initialValue = fromCurrencyInputValue || 1;
         handleCurrencyInputChange({ target: { value: initialValue } }, "from", 'ignoreFocus');
-    }, [updateDisplayContent, handleCurrencyInputChange]);
+        return true;
+    }, [updateDisplayContent, handleCurrencyInputChange, fromCurrencyInputValue]);
 
     useEffect(() => {
         async function fetchData() {
-            try {
-                let currencyData = localStorage.getItem('currencyData');
-                const fetchedDate = new Date(Number(localStorage.getItem('currencyFetchTime'))).toLocaleDateString('en-GB');
-                const today = new Date().toLocaleDateString('en-GB');
-
-                if (currencyData) {
-                    processData(JSON.parse(currencyData));
-                    if (fetchedDate !== today) {
-                        fetchLatestData().then(data => {
-                            if (data) {
-                                processData(data);
-                            }
-                        });
+            // First try to use cached data to show something immediately
+            let cachedData = null;
+            const storedDataStr = localStorage.getItem('currencyData');
+            
+            if (storedDataStr) {
+                try {
+                    cachedData = JSON.parse(storedDataStr);
+                    if (processData(cachedData)) {
+                        // If we have valid cached data, update UI immediately
+                        setError("");
                     }
-                } else {
-                    const data = await fetchLatestData();
-                    processData(data);
+                } catch (e) {
+                    console.error("Error parsing cached data:", e);
                 }
-            } catch (error) {
-                let currencyData = localStorage.getItem('currencyData');
-                if (currencyData) {
-                    processData(JSON.parse(currencyData));
-                } else {
+            }
+            
+            // Try to fetch new data regardless of cache status
+            try {
+                const isSameDay = () => {
+                    const fetchTime = localStorage.getItem('currencyFetchTime');
+                    if (!fetchTime) return false;
+                    
+                    const fetchDate = new Date(Number(fetchTime)).toLocaleDateString('en-GB');
+                const today = new Date().toLocaleDateString('en-GB');
+                    return fetchDate === today;
+                };
+                
+                // Only fetch new data if we don't have same-day data already
+                if (!isSameDay()) {
+                    const newData = await fetchLatestData();
+                    
+                    if (newData) {
+                        // If fetch succeeded, process the new data
+                        processData(newData);
+                        setError("");
+                    } else if (!cachedData) {
+                        // If fetch failed and we don't have cached data
+                        setError("Please connect to internet and try again");
+                    }
+                    // If fetch failed but we have cached data, keep using that (already processed above)
+                }
+            } catch (err) {
+                console.error("Error fetching data:", err);
+                
+                if (!cachedData) {
                     setError("Please connect to internet and try again");
                 }
+                // If error but we have cached data, keep using that
             } finally {
                 setLoading(false);
             }
         }
+        
         fetchData();
-    }, [fetchLatestData, processData, setError, setLoading]);
+    }, [fetchLatestData, processData]);
 
     return (
         <RetroContainer>
             <RetroHeader>Currency Converter</RetroHeader>
-            {loading || error !== "Loading..." ? (
+            {isOffline && <div style={{color: color, textAlign: 'center', marginBottom: '10px', display: 'none'}}>
+                Offline Mode - Using cached data
+            </div>}
+            {loading ? (
+                <div id="loading" className="loading">{error || "Loading..."}</div>
+            ) : error ? (
                 <div id="loading" className="loading">{error}</div>
             ) : (
                 <>
                     <RetroExchangeRate>{displaySelectedRates}</RetroExchangeRate>
                     <RetroCard>
                         {['from', 'to'].map((type) => (
-                            <div key={type} style={type == "to" ? {} : { marginBottom: '20px' }}>
-                                <CurrencySelector
+                            <div key={type} style={type === "to" ? {} : { marginBottom: '20px' }}>
+                                <MemoizedCurrencySelector
                                     type={type}
                                     fromCurrencyValue={fromCurrencyValue}
                                     toCurrencyValue={toCurrencyValue}
@@ -236,7 +286,6 @@ function App() {
                                             pattern: '[0-9]*'
                                         }
                                     }}
-                                // autoFocus={typeField === type}
                                 />
                             </div>
                         ))}
@@ -259,5 +308,5 @@ function App() {
         </RetroContainer>
     );
 }
-const MemoizedCurrencySelector = React.memo(CurrencySelector);
+
 export default App;
