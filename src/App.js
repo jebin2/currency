@@ -77,7 +77,7 @@ const RetroPWA = styled('div')({
 
 
 function App() {
-    const [error, setError] = useState("Loading...");
+    const [error, setError] = useState("");
     const [supportedCurrencies, setSupportedCurrencies] = useState([]);
     const [displaySelectedRates, setDisplaySelectedRates] = useState("");
     const [updatedTime, setUpdatedTime] = useState("");
@@ -88,6 +88,7 @@ function App() {
     const [toCurrencyInputValue, setToCurrencyInputValue] = useState("0");
     const [typeField, setTypeField] = useState("");
     const [isOffline, setIsOffline] = useState(false);
+    const [hasCachedData, setHasCachedData] = useState(false);
 
     useEffect(() => {
         const exchangeRates = JSON.parse(localStorage.getItem('currencyData'))?.rates;
@@ -113,7 +114,7 @@ function App() {
         const convertedAmount = amount * (toRate / fromRate);
         const finalVal = Number(convertedAmount);
         return finalVal % 1 === 0 ? finalVal : finalVal.toFixed(2);
-    }, [fromCurrencyValue, toCurrencyValue]); // Dependencies
+    }, [fromCurrencyValue, toCurrencyValue]);
 
     const updateDisplayContent = useCallback(() => {
         setDisplaySelectedRates(`1 ${fromCurrencyValue} = ${convertCurrency(1)} ${toCurrencyValue}`);
@@ -133,7 +134,6 @@ function App() {
     const fetchLatestData = useCallback(async () => {
         try {
             const response = await fetch('https://jeapis.netlify.app/.netlify/functions/currency?from=USD&to=INR', {
-                // Add a timeout to the fetch
                 signal: AbortSignal.timeout(5000) // 5 second timeout
             });
             
@@ -168,7 +168,7 @@ function App() {
             setToCurrencyInputValue(value);
             setFromCurrencyInputValue(convertCurrency(value, toCurrencyValue, fromCurrencyValue));
         }
-    }, [fromCurrencyValue, toCurrencyValue, convertCurrency]); // Add dependencies
+    }, [fromCurrencyValue, toCurrencyValue, convertCurrency]);
 
     const processData = useCallback((data) => {
         if (!data || !data.supportedCurrency || !data.rates) {
@@ -200,14 +200,15 @@ function App() {
                     if (processData(cachedData)) {
                         // If we have valid cached data, update UI immediately
                         setError("");
+                        setLoading(false);
+                        setHasCachedData(true);
                     }
                 } catch (e) {
                     console.error("Error parsing cached data:", e);
                 }
             }
             
-            // Try to fetch new data regardless of cache status
-            try {
+            // Check if we need to fetch new data
                 const isSameDay = () => {
                     const fetchTime = localStorage.getItem('currencyFetchTime');
                     if (!fetchTime) return false;
@@ -217,28 +218,31 @@ function App() {
                     return fetchDate === today;
                 };
                 
-                // Only fetch new data if we don't have same-day data already
+            // Fetch new data if it's not from today
                 if (!isSameDay()) {
+                try {
                     const newData = await fetchLatestData();
                     
                     if (newData) {
-                        // If fetch succeeded, process the new data
+                        // Process new data in the background
                         processData(newData);
                         setError("");
                     } else if (!cachedData) {
-                        // If fetch failed and we don't have cached data
+                        // Only show error if we don't have cached data
                         setError("Please connect to internet and try again");
                     }
-                    // If fetch failed but we have cached data, keep using that (already processed above)
-                }
             } catch (err) {
                 console.error("Error fetching data:", err);
                 
                 if (!cachedData) {
                     setError("Please connect to internet and try again");
                 }
-                // If error but we have cached data, keep using that
-            } finally {
+                }
+            }
+            
+            // Ensure we turn off loading state even if there was an error
+            // but only if we don't have cached data
+            if (!cachedData) {
                 setLoading(false);
             }
         }
@@ -252,9 +256,9 @@ function App() {
             {isOffline && <div style={{color: color, textAlign: 'center', marginBottom: '10px', display: 'none'}}>
                 Offline Mode - Using cached data
             </div>}
-            {loading ? (
+            {loading && !hasCachedData ? (
                 <div id="loading" className="loading">{error || "Loading..."}</div>
-            ) : error ? (
+            ) : error && !hasCachedData ? (
                 <div id="loading" className="loading">{error}</div>
             ) : (
                 <>
