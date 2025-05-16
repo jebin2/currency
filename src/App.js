@@ -183,7 +183,7 @@ function App() {
         }
         setSupportedCurrencies(curr);
         updateDisplayContent();
-        const initialValue = fromCurrencyInputValue || 1;
+        const initialValue = fromCurrencyInputValue;
         handleCurrencyInputChange({ target: { value: initialValue } }, "from", 'ignoreFocus');
         return true;
     }, [updateDisplayContent, handleCurrencyInputChange, fromCurrencyInputValue]);
