@@ -1,12 +1,12 @@
 {
   "files": {
     "main.css": "/currency/static/css/main.09a8fa7f.css",
-    "main.js": "/currency/static/js/main.092b5d5e.js",
+    "main.js": "/currency/static/js/main.b2a20ccd.js",
     "service-worker.js": "/currency/service-worker.js",
     "index.html": "/currency/index.html"
   },
   "entrypoints": [
     "static/css/main.09a8fa7f.css",
-    "static/js/main.092b5d5e.js"
+    "static/js/main.b2a20ccd.js"
   ]
 }
