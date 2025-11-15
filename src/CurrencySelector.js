@@ -114,7 +114,6 @@ const CurrencySelector = ({ type, fromCurrencyValue, toCurrencyValue, setFromCur
                 value={type === 'from' ? fromCurrencyValue : toCurrencyValue}
                 onClick={handleOpen}
                 readOnly
-                aria-label={type === 'from' ? 'Select from currency' : 'Select to currency'}
                 sx={{
                     color: `${color}`,
                     width: "100%",                
@@ -124,6 +123,11 @@ const CurrencySelector = ({ type, fromCurrencyValue, toCurrencyValue, setFromCur
                 }}
                 variant="outlined"
                 size="small"
+                slotProps={{
+                    htmlInput: {
+                        'aria-label': type === 'from' ? 'Select from currency' : 'Select to currency'
+                    }
+                }}
             />
             <RetroDialog open={open} onClose={handleClose}>
                 {/* <RetroDialogTitle>Select Currency</RetroDialogTitle> */}
@@ -136,13 +140,17 @@ const CurrencySelector = ({ type, fromCurrencyValue, toCurrencyValue, setFromCur
                         variant="outlined"
                         value={searchValue}
                         onChange={(e) => setSearchValue(e.target.value)}
-                        aria-label="Search for a currency"
                         InputProps={{
                             startAdornment: (
                                 <RetroIconButton>
                                     <Search />
                                 </RetroIconButton>
                             ),
+                        }}
+                        slotProps={{
+                            htmlInput: {
+                                'aria-label': "Search for a currency"
+                            }
                         }}
                     />
                     <RetroList>

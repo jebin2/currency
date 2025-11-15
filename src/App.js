@@ -312,11 +312,11 @@ function App() {
                                     onChange={(e) => handleCurrencyInputChange(e, type)}
                                     variant="outlined"
                                     fullWidth
-                                    aria-label={type === 'from' ? 'From currency amount' : 'To currency amount'}
                                     slotProps={{
                                         htmlInput: {
                                             inputMode: 'decimal',
-                                            pattern: '[0-9]*'
+                                            pattern: '[0-9]*',
+                                            'aria-label': type === 'from' ? 'From currency amount' : 'To currency amount'
                                         }
                                     }}
                                 />
