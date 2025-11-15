@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { styled } from '@mui/material/styles';
 import {
     Dialog,
@@ -11,7 +11,7 @@ import {
     Button,
     IconButton,
 } from '@mui/material';
-import { Search } from '@mui/icons-material';
+import Search from '@mui/icons-material/Search';
 import { FixedSizeList } from 'react-window';
 
 // const color = "#FF6B6B";
@@ -82,8 +82,11 @@ const CurrencySelector = ({ type, fromCurrencyValue, toCurrencyValue, setFromCur
     const [open, setOpen] = useState(false);
     const [searchValue, setSearchValue] = useState('');
 
-    const filteredCurrencies = supportedCurrencies.filter(currency =>
-        currency.toLowerCase().includes(searchValue.toLowerCase())
+    const filteredCurrencies = useMemo(() => 
+        supportedCurrencies.filter(currency =>
+            currency.toLowerCase().includes(searchValue.toLowerCase())
+        ), 
+      [supportedCurrencies, searchValue] // Only re-run when these change
     );
 
     const handleOpen = () => {
