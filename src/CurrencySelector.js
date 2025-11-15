@@ -1,8 +1,7 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { styled } from '@mui/material/styles';
+import styled from '@mui/material/styles/styled';
 import {
     Dialog,
-    DialogTitle,
     DialogContent,
     DialogActions,
     List,

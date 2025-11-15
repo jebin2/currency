@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { styled } from '@mui/material/styles';
-import { TextField, Autocomplete, Popper } from '@mui/material';
+import React, { useState, useEffect, useCallback } from 'react';
+import styled from '@mui/material/styles/styled';
+import TextField from '@mui/material/TextField';
 import ReactPWAPrompt from 'react-ios-pwa-prompt';
 import githublogo from './images/github-mark-white.png';
 import CurrencySelector from './CurrencySelector';
