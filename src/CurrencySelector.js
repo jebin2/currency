@@ -1,89 +1,36 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import styled from '@mui/material/styles/styled';
-import {
-    Dialog,
-    DialogContent,
-    DialogActions,
-    List,
-    ListItem,
-    ListItemText,
-    Button,
-} from '@mui/material';
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 
-// const color = "#FF6B6B";
-const color = "white";
-
-const RetroDialog = styled(Dialog)({
-    '& .MuiDialog-paper': {
-        backgroundColor: '#1A535C',
-        border: `4px solid ${color}`,
-        borderRadius: '10px',
-        color: `${color}`,
-        minHeight: '50vh',  // Avoid full height causing layout shifts
-        maxHeight: '80vh',  // Prevent excessive recalculations
-    },
-});
-
-const RetroDialogContent = styled(DialogContent)({
-    padding: '20px',
-});
-
-const RetroList = styled(List)({
-    maxHeight: '300px',
-    overflowY: 'auto',
-    '&::-webkit-scrollbar': {
-        width: '10px',
-    },
-    '&::-webkit-scrollbar-track': {
-        background: '#1A535C',
-    },
-    '&::-webkit-scrollbar-thumb': {
-        background: '#4ECDC4',
-        borderRadius: '5px',
-    },
-});
-
-const RetroListItem = styled(ListItem)({
-    '&:hover': {
-        backgroundColor: '#4ECDC4',
-    },
-});
-
-const RetroListItemText = styled(ListItemText)({
-    '& .MuiListItemText-primary': {
-        fontSize: '1rem',
-        fontWeight: 'bold',
-    },
-});
-
-const RetroButton = styled(Button)({
-    backgroundColor: `${color}`,
-    color: 'black',
-    fontWeight: 'bold',
-});
-
-const MemoizedRetroListItem = React.memo(RetroListItem);
-const MemoizedRetroListItemText = React.memo(RetroListItemText);
-
-const CurrencySelector = ({ type, fromCurrencyValue, toCurrencyValue, setFromCurrencyValue, setToCurrencyValue, fromCurrencyInputValue, setToCurrencyInputValue, convertCurrency, supportedCurrencies, RetroTextField }) => {
+const CurrencySelector = ({
+    type,
+    fromCurrencyValue,
+    toCurrencyValue,
+    setFromCurrencyValue,
+    setToCurrencyValue,
+    fromCurrencyInputValue,
+    setToCurrencyInputValue,
+    convertCurrency,
+    supportedCurrencies,
+}) => {
     const [open, setOpen] = useState(false);
     const [searchValue, setSearchValue] = useState('');
+    const searchRef = useRef(null);
 
-    const filteredCurrencies = useMemo(() => 
+    const filteredCurrencies = useMemo(() =>
         supportedCurrencies.filter(currency =>
             currency.toLowerCase().includes(searchValue.toLowerCase())
-        ), 
-      [supportedCurrencies, searchValue] // Only re-run when these change
+        ),
+      [supportedCurrencies, searchValue]
     );
 
     const handleOpen = () => {
         setOpen(true);
     };
 
-    const handleClose = () => {
+    const handleClose = useCallback(() => {
         setOpen(false);
         setSearchValue('');
-    };
+    }, []);
+
     const handleClick = useCallback((currency) => {
         if (type === 'from') {
             setFromCurrencyValue(currency.split(" - ")[0]);
@@ -93,61 +40,80 @@ const CurrencySelector = ({ type, fromCurrencyValue, toCurrencyValue, setFromCur
             setToCurrencyInputValue(convertCurrency(fromCurrencyInputValue, fromCurrencyValue, currency));
         }
         handleClose();
-    }, [type, fromCurrencyInputValue, fromCurrencyValue, toCurrencyValue, convertCurrency]);
+    }, [type, fromCurrencyInputValue, fromCurrencyValue, toCurrencyValue, convertCurrency, setFromCurrencyValue, setToCurrencyInputValue, setToCurrencyValue, handleClose]);
+
+    useEffect(() => {
+        if (!open) return undefined;
+
+        const timeoutId = window.setTimeout(() => {
+            searchRef.current?.focus();
+        }, 0);
+
+        const handleKeyDown = (event) => {
+            if (event.key === 'Escape') {
+                handleClose();
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.clearTimeout(timeoutId);
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [open, handleClose]);
 
     return (
         <div>
-            <RetroTextField
-                value={type === 'from' ? fromCurrencyValue : toCurrencyValue}
+            <button
+                type="button"
+                className="retro-input currency-button"
                 onClick={handleOpen}
-                readOnly
-                sx={{
-                    color: `${color}`,
-                    width: "100%",                
-                    borderRadius: "2px",
-                    fontWeight: "600 !important",
-                    letterSpacing: "0.1rem !important",
-                }}
-                variant="outlined"
-                size="small"
-                slotProps={{
-                    htmlInput: {
-                        'aria-label': type === 'from' ? 'Select from currency' : 'Select to currency'
-                    }
-                }}
-            />
-            <RetroDialog open={open} onClose={handleClose}>
-                {/* <RetroDialogTitle>Select Currency</RetroDialogTitle> */}
-                <RetroDialogContent>
-                    <RetroTextField
-                        autoFocus
-                        margin="dense"
-                        type="text"
-                        fullWidth
-                        variant="outlined"
-                        value={searchValue}
-                        placeholder="Search"
-                        onChange={(e) => setSearchValue(e.target.value)}
-                        slotProps={{
-                            htmlInput: {
-                                'aria-label': "Search for a currency"
-                            }
-                        }}
-                    />
-                    <RetroList>
-                        {filteredCurrencies.map((currency) => (
-                            <MemoizedRetroListItem key={currency} button onClick={() => handleClick(currency)}>
-                                <MemoizedRetroListItemText primary={currency} />
-                            </MemoizedRetroListItem>
-                        ))}
-                    </RetroList>
-                </RetroDialogContent>
-                <DialogActions>
-                    <RetroButton onClick={handleClose}>
-                        Cancel
-                    </RetroButton>
-                </DialogActions>
-            </RetroDialog>
+                aria-label={type === 'from' ? 'Select from currency' : 'Select to currency'}
+            >
+                {type === 'from' ? fromCurrencyValue : toCurrencyValue}
+            </button>
+
+            {open && (
+                <div className="dialog-backdrop" role="presentation" onMouseDown={handleClose}>
+                    <div
+                        className="currency-dialog"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Select currency"
+                        onMouseDown={(event) => event.stopPropagation()}
+                    >
+                        <div className="dialog-content">
+                            <input
+                                ref={searchRef}
+                                className="retro-input search-input"
+                                type="text"
+                                value={searchValue}
+                                placeholder="Search"
+                                onChange={(event) => setSearchValue(event.target.value)}
+                                aria-label="Search for a currency"
+                            />
+                            <div className="currency-list" role="listbox">
+                                {filteredCurrencies.map((currency) => (
+                                    <button
+                                        type="button"
+                                        className="currency-option"
+                                        key={currency}
+                                        onClick={() => handleClick(currency)}
+                                        role="option"
+                                    >
+                                        {currency}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="dialog-actions">
+                            <button type="button" className="cancel-button" onClick={handleClose}>
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

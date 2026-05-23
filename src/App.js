@@ -1,6 +1,5 @@
-import React, { Suspense, lazy, useState, useEffect, useCallback } from 'react';
-import styled from '@mui/material/styles/styled';
-import TextField from '@mui/material/TextField';
+import React, { Suspense, lazy, useState, useEffect, useCallback, useRef } from 'react';
+import './App.css';
 import githublogo from './images/github-mark-white.png';
 import CurrencySelector from './CurrencySelector';
 
@@ -8,72 +7,6 @@ const MemoizedCurrencySelector = React.memo(CurrencySelector);
 const ReactPWAPrompt = lazy(() => import('react-ios-pwa-prompt'));
 // const color = "#FF6B6B";
 const color = "white";
-
-const RetroContainer = styled('div')({
-    boxSizing: 'border-box',
-});
-
-const RetroHeader = styled('h1')({
-    color: `${color}`,
-    textAlign: 'center',
-    fontSize: '2rem',
-    //   textShadow: '3px 3px #FF6B6B',
-});
-
-const RetroCard = styled('div')({
-    background: '#1A535C',
-    border: `4px solid ${color}`,
-    borderRadius: '10px',
-    padding: '20px',
-    boxShadow: '0 0 10px rgba(0,0,0,0.5)',
-    maxWidth: '500px',
-    margin: '0 auto',
-});
-
-const RetroTextField = styled(TextField)({
-    '& .MuiInputBase-root': {
-        fontWeight: 'bold',
-        color: `${color}`,
-        backgroundColor: '#1A535C',
-        border: '2px solid #4ECDC4',
-        borderRadius: '5px',
-        '&:hover, &.Mui-focused': {
-            border: `2px solid ${color}`,
-            boxShadow: '0 0 10px rgba(255,230,109,0.5)',
-        },
-    },
-    '& .MuiOutlinedInput-notchedOutline': {
-        border: 'none',
-    },
-});
-
-const RetroExchangeRate = styled('div')({
-    color: `${color}`,
-    textAlign: 'center',
-    fontSize: '1rem',
-    marginBottom: '20px',
-});
-
-const RetroUpdateInfo = styled('div')({
-    color: `${color}`,
-    textAlign: 'center',
-    fontSize: '1rem',
-    marginTop: '20px',
-});
-
-const RetroFooter = styled('div')({
-    color: `${color}`,
-    textAlign: 'center',
-    marginTop: '20px',
-    '& img': {
-        width: '30px',
-        height: '30px',
-    },
-});
-
-const RetroPWA = styled('div')({
-    letterSpacing: 'normal',
-});
 
 const normalizeAmountInput = (rawValue) => {
     let value = String(rawValue ?? '').trim();
@@ -118,6 +51,7 @@ function App() {
     const [isOffline, setIsOffline] = useState(false);
     const [hasCachedData, setHasCachedData] = useState(false);
     const [showPwaPrompt, setShowPwaPrompt] = useState(false);
+    const hasLoadedData = useRef(false);
 
     const convertCurrency = useCallback((amount, from = fromCurrencyValue, to = toCurrencyValue) => {
         const exchangeRates = JSON.parse(localStorage.getItem('currencyData'))?.rates;
@@ -254,6 +188,11 @@ function App() {
     }, [updateDisplayContent]);
 
     useEffect(() => {
+        if (hasLoadedData.current) {
+            return;
+        }
+        hasLoadedData.current = true;
+
         async function fetchData() {
             // First try to use cached data to show something immediately
             let cachedData = null;
@@ -331,8 +270,8 @@ function App() {
     }, []);
 
     return (
-        <RetroContainer>
-            <RetroHeader>Currency Converter</RetroHeader>
+        <div className="app">
+            <h1 className="app-title">Currency Converter</h1>
             {isOffline && <div style={{ color: color, textAlign: 'center', marginBottom: '10px', display: 'none' }}>
                 Offline Mode - Using cached data
             </div>}
@@ -342,8 +281,8 @@ function App() {
                 <div id="loading" className="loading">{error}</div>
             ) : (
                 <>
-                    <RetroExchangeRate>{displaySelectedRates}</RetroExchangeRate>
-                    <RetroCard>
+                    <div className="exchange-rate">{displaySelectedRates}</div>
+                    <div className="converter-card">
                         {['from', 'to'].map((type) => (
                             <div key={type} style={type === "to" ? {} : { marginBottom: '20px' }}>
                                 <MemoizedCurrencySelector
@@ -356,48 +295,41 @@ function App() {
                                     setToCurrencyInputValue={setToCurrencyInputValue}
                                     convertCurrency={convertCurrency}
                                     supportedCurrencies={supportedCurrencies}
-                                    RetroTextField={RetroTextField}
                                 />
-                                <RetroTextField
-                                    style={{ marginTop: '10px' }}
+                                <input
+                                    className="retro-input amount-input"
                                     value={type === 'from' ? fromCurrencyInputValue : toCurrencyInputValue}
                                     onChange={(e) => handleCurrencyInputChange(e, type)}
                                     onPaste={(e) => handleCurrencyPaste(e, type)}
                                     onFocus={(e) => e.target.select()}
                                     placeholder="0.00"
-                                    variant="outlined"
-                                    fullWidth
-                                    slotProps={{
-                                        htmlInput: {
-                                            inputMode: 'decimal',
-                                            autoComplete: 'off',
-                                            'aria-label': type === 'from' ? 'From currency amount' : 'To currency amount'
-                                        }
-                                    }}
+                                    inputMode="decimal"
+                                    autoComplete="off"
+                                    aria-label={type === 'from' ? 'From currency amount' : 'To currency amount'}
                                 />
                             </div>
                         ))}
-                    </RetroCard>
-                    <RetroUpdateInfo>{updatedTime}</RetroUpdateInfo>
+                    </div>
+                    <div className="update-info">{updatedTime}</div>
                 </>
             )}
-            <RetroFooter>
+            <div className="footer">
                 <a href="https://github.com/jebin2" target="_blank" rel="noopener noreferrer">
                     <img src={githublogo} alt="GitHub logo" />
                 </a>
-            </RetroFooter>
+            </div>
             {showPwaPrompt && (
-                <RetroPWA>
+                <div className="pwa-prompt">
                     <Suspense fallback={null}>
                         <ReactPWAPrompt
                             timesToShow={5}
                             promptOnVisit={1}
-                            appIconPath="/currency/favicon.ico"
+                            appIconPath={`${process.env.PUBLIC_URL}/favicon.ico`}
                         />
                     </Suspense>
-                </RetroPWA>
+                </div>
             )}
-        </RetroContainer>
+        </div>
     );
 }
 
