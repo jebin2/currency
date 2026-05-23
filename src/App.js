@@ -270,7 +270,7 @@ function App() {
     }, []);
 
     return (
-        <div className="app">
+        <main className="app">
             <h1 className="app-title">Currency Converter</h1>
             {isOffline && <div style={{ color: color, textAlign: 'center', marginBottom: '10px', display: 'none' }}>
                 Offline Mode - Using cached data
@@ -329,7 +329,7 @@ function App() {
                     </Suspense>
                 </div>
             )}
-        </div>
+        </main>
     );
 }
 

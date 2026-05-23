@@ -1,0 +1,20 @@
+/currency/
+  Cache-Control: no-cache
+
+/currency/index.html
+  Cache-Control: no-cache
+
+/currency/service-worker.js
+  Cache-Control: no-cache
+
+/currency/manifest.json
+  Cache-Control: public, max-age=3600
+
+/currency/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/currency/*.png
+  Cache-Control: public, max-age=31536000, immutable
+
+/currency/*.ico
+  Cache-Control: public, max-age=31536000, immutable
