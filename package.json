@@ -6,13 +6,11 @@
     "dependencies": {
         "@emotion/react": "^11.13.3",
         "@emotion/styled": "^11.13.0",
-        "@mui/icons-material": "^6.1.2",
         "@mui/material": "^6.1.2",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
         "react-ios-pwa-prompt": "^2.0.6",
         "react-scripts": "5.0.1",
-        "react-window": "^1.8.11",
         "workbox-core": "^6.6.0",
         "workbox-expiration": "^6.6.0",
         "workbox-precaching": "^6.6.0",

@@ -8,10 +8,7 @@ import {
     ListItem,
     ListItemText,
     Button,
-    IconButton,
 } from '@mui/material';
-import Search from '@mui/icons-material/Search';
-import { FixedSizeList } from 'react-window';
 
 // const color = "#FF6B6B";
 const color = "white";
@@ -32,7 +29,7 @@ const RetroDialogContent = styled(DialogContent)({
 });
 
 const RetroList = styled(List)({
-    maxHeight: '80%',
+    maxHeight: '300px',
     overflowY: 'auto',
     '&::-webkit-scrollbar': {
         width: '10px',
@@ -65,17 +62,8 @@ const RetroButton = styled(Button)({
     fontWeight: 'bold',
 });
 
-const RetroIconButton = styled(IconButton)({
-    color: '#4ECDC4',
-});
 const MemoizedRetroListItem = React.memo(RetroListItem);
 const MemoizedRetroListItemText = React.memo(RetroListItemText);
-
-const Row = ({ index, style, data }) => (
-    <MemoizedRetroListItem style={style} button onClick={() => data.handleClick(data.items[index])}>
-        <MemoizedRetroListItemText primary={data.items[index]} />
-    </MemoizedRetroListItem>
-);
 
 const CurrencySelector = ({ type, fromCurrencyValue, toCurrencyValue, setFromCurrencyValue, setToCurrencyValue, fromCurrencyInputValue, setToCurrencyInputValue, convertCurrency, supportedCurrencies, RetroTextField }) => {
     const [open, setOpen] = useState(false);
@@ -138,14 +126,8 @@ const CurrencySelector = ({ type, fromCurrencyValue, toCurrencyValue, setFromCur
                         fullWidth
                         variant="outlined"
                         value={searchValue}
+                        placeholder="Search"
                         onChange={(e) => setSearchValue(e.target.value)}
-                        InputProps={{
-                            startAdornment: (
-                                <RetroIconButton>
-                                    <Search />
-                                </RetroIconButton>
-                            ),
-                        }}
                         slotProps={{
                             htmlInput: {
                                 'aria-label': "Search for a currency"
@@ -153,14 +135,11 @@ const CurrencySelector = ({ type, fromCurrencyValue, toCurrencyValue, setFromCur
                         }}
                     />
                     <RetroList>
-                    <FixedSizeList
-                        height={300} // Set a fixed height for performance
-                        itemSize={40} // Each item takes 40px
-                        itemCount={filteredCurrencies.length}
-                        itemData={{ items: filteredCurrencies, handleClick }}
-                    >
-                        {Row}
-                    </FixedSizeList>
+                        {filteredCurrencies.map((currency) => (
+                            <MemoizedRetroListItem key={currency} button onClick={() => handleClick(currency)}>
+                                <MemoizedRetroListItemText primary={currency} />
+                            </MemoizedRetroListItem>
+                        ))}
                     </RetroList>
                 </RetroDialogContent>
                 <DialogActions>

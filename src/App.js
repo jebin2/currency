@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { Suspense, lazy, useState, useEffect, useCallback } from 'react';
 import styled from '@mui/material/styles/styled';
 import TextField from '@mui/material/TextField';
-import ReactPWAPrompt from 'react-ios-pwa-prompt';
 import githublogo from './images/github-mark-white.png';
 import CurrencySelector from './CurrencySelector';
 
 const MemoizedCurrencySelector = React.memo(CurrencySelector);
+const ReactPWAPrompt = lazy(() => import('react-ios-pwa-prompt'));
 // const color = "#FF6B6B";
 const color = "white";
 
@@ -75,6 +75,35 @@ const RetroPWA = styled('div')({
     letterSpacing: 'normal',
 });
 
+const normalizeAmountInput = (rawValue) => {
+    let value = String(rawValue ?? '').trim();
+    if (!value) return '';
+
+    value = value
+        .replace(/[^\d.,]/g, '')
+        .replace(/\s/g, '');
+
+    if (!value) return '';
+
+    if (value.includes('.')) {
+        value = value.replace(/,/g, '');
+    } else if (value.includes(',')) {
+        const commaParts = value.split(',');
+        const lastPart = commaParts[commaParts.length - 1];
+        const singleDecimalComma = commaParts.length === 2 && lastPart.length > 0 && lastPart.length <= 2;
+        value = singleDecimalComma
+            ? `${commaParts[0]}.${lastPart}`
+            : commaParts.join('');
+    }
+
+    const [wholePart, ...decimalParts] = value.split('.');
+    const whole = wholePart.replace(/\D/g, '');
+    const decimal = decimalParts.join('').replace(/\D/g, '');
+    const normalized = decimalParts.length > 0 ? `${whole || '0'}.${decimal}` : whole;
+
+    return normalized;
+};
+
 
 function App() {
     const [error, setError] = useState("");
@@ -86,23 +115,25 @@ function App() {
     const [fromCurrencyInputValue, setFromCurrencyInputValue] = useState("1");
     const [toCurrencyValue, setToCurrencyValue] = useState(localStorage.getItem('toCur') || "INR");
     const [toCurrencyInputValue, setToCurrencyInputValue] = useState("0");
-    const [typeField, setTypeField] = useState("");
     const [isOffline, setIsOffline] = useState(false);
     const [hasCachedData, setHasCachedData] = useState(false);
+    const [showPwaPrompt, setShowPwaPrompt] = useState(false);
 
     const convertCurrency = useCallback((amount, from = fromCurrencyValue, to = toCurrencyValue) => {
         const exchangeRates = JSON.parse(localStorage.getItem('currencyData'))?.rates;
-        if (!amount || !exchangeRates) return 0;
+        if (amount === '' || amount === null || amount === undefined || !exchangeRates) return '';
+        const numericAmount = Number(amount);
+        if (Number.isNaN(numericAmount)) return '';
         from = (from + "").includes(" - ") ? from.split(" - ")[0] : from;
         to = (to + "").includes(" - ") ? to.split(" - ")[0] : to;
-        if (from === to) return Number(amount) % 1 === 0 ? Number(amount) : Number(amount).toFixed(2);
+        if (from === to) return numericAmount % 1 === 0 ? numericAmount : numericAmount.toFixed(2);
 
         const fromRate = exchangeRates[from];
         const toRate = exchangeRates[to];
 
         if (!fromRate || !toRate) return 0;
 
-        const convertedAmount = amount * (toRate / fromRate);
+        const convertedAmount = numericAmount * (toRate / fromRate);
         const finalVal = Number(convertedAmount);
         return finalVal % 1 === 0 ? finalVal : finalVal.toFixed(2);
     }, [fromCurrencyValue, toCurrencyValue]);
@@ -168,11 +199,8 @@ function App() {
         }
     }, []);
 
-    const handleCurrencyInputChange = useCallback((e, type, ignoreFocus) => {
-        setTypeField(ignoreFocus === "ignoreFocus" ? "" : type);
-        if (isNaN(e.target.value)) return;
-
-        const value = e.target.value;
+    const updateAmount = useCallback((rawValue, type) => {
+        const value = normalizeAmountInput(rawValue);
         if (type === "from") {
             setFromCurrencyInputValue(value);
             setToCurrencyInputValue(convertCurrency(value));
@@ -181,6 +209,15 @@ function App() {
             setFromCurrencyInputValue(convertCurrency(value, toCurrencyValue, fromCurrencyValue));
         }
     }, [fromCurrencyValue, toCurrencyValue, convertCurrency]);
+
+    const handleCurrencyInputChange = useCallback((e, type) => {
+        updateAmount(e.target.value, type);
+    }, [updateAmount]);
+
+    const handleCurrencyPaste = useCallback((e, type) => {
+        e.preventDefault();
+        updateAmount(e.clipboardData.getData('text'), type);
+    }, [updateAmount]);
 
     const processData = useCallback((data) => {
         if (!data || !data.supportedCurrency || !data.rates) {
@@ -214,7 +251,7 @@ function App() {
 
         updateDisplayContent();
         return true;
-    }, [updateDisplayContent, fromCurrencyValue, toCurrencyValue, fromCurrencyInputValue]);
+    }, [updateDisplayContent]);
 
     useEffect(() => {
         async function fetchData() {
@@ -278,6 +315,21 @@ function App() {
         fetchData();
     }, [fetchLatestData, processData]);
 
+    useEffect(() => {
+        const isIos = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+        const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+        if (!isIos || isStandalone) return undefined;
+
+        const showPrompt = () => setShowPwaPrompt(true);
+        if ('requestIdleCallback' in window) {
+            const idleId = window.requestIdleCallback(showPrompt, { timeout: 3000 });
+            return () => window.cancelIdleCallback(idleId);
+        }
+
+        const timeoutId = window.setTimeout(showPrompt, 2500);
+        return () => window.clearTimeout(timeoutId);
+    }, []);
+
     return (
         <RetroContainer>
             <RetroHeader>Currency Converter</RetroHeader>
@@ -310,12 +362,15 @@ function App() {
                                     style={{ marginTop: '10px' }}
                                     value={type === 'from' ? fromCurrencyInputValue : toCurrencyInputValue}
                                     onChange={(e) => handleCurrencyInputChange(e, type)}
+                                    onPaste={(e) => handleCurrencyPaste(e, type)}
+                                    onFocus={(e) => e.target.select()}
+                                    placeholder="0.00"
                                     variant="outlined"
                                     fullWidth
                                     slotProps={{
                                         htmlInput: {
                                             inputMode: 'decimal',
-                                            pattern: '[0-9]*',
+                                            autoComplete: 'off',
                                             'aria-label': type === 'from' ? 'From currency amount' : 'To currency amount'
                                         }
                                     }}
@@ -331,13 +386,17 @@ function App() {
                     <img src={githublogo} alt="GitHub logo" />
                 </a>
             </RetroFooter>
-            <RetroPWA>
-                <ReactPWAPrompt
-                    timesToShow={5}
-                    promptOnVisit={1}
-                    appIconPath="/currency/favicon.ico"
-                />
-            </RetroPWA>
+            {showPwaPrompt && (
+                <RetroPWA>
+                    <Suspense fallback={null}>
+                        <ReactPWAPrompt
+                            timesToShow={5}
+                            promptOnVisit={1}
+                            appIconPath="/currency/favicon.ico"
+                        />
+                    </Suspense>
+                </RetroPWA>
+            )}
         </RetroContainer>
     );
 }
